@@ -1,21 +1,15 @@
-# RMHC FHIR Warehouse - Complete Migration Pipeline
+1. Container Advantage:
+Problem: When students work across Windows, macOS, and Linux systems, inconsistencies in Java versions, HAPI FHIR dependencies, and PostgreSQL configurations frequently result in “dependency hell.”
+Solution: Docker standardises the entire technology stack with a single command that works identically across all machines.
+Result: Every team member gets the identical production environment running instantly.
+Port mapping bridges the isolated Docker container to access on localhost.
 
-##The Architect's Narrative
+2. Semantic Integrity:
+Problem: Converting legacy CSV data to proper FHIR codes when these mappings are scattered throughout Python code creates a maintenance nightmare.
+Solution: FHIR Shorthand (FSH) profiles, combined with Concept Maps, ensure that all codes are validated at the server level, not hardcoded in application logic.
+Result: The server itself validates and converts correctly to business rules live in the FHIR server, not scattered application code. 
 
-### 1. Container Advantage (Dependency Hell Solved)
-**Problem**: Different student laptops (Windows/Mac/Linux) face Java version conflicts, HAPI FHIR dependencies, PostgreSQL configs—classic "dependency hell".
-**Solution**: Docker standardizes the entire stack:docker run -p 8080:8080 hapiproject/hapi:latest
-**Result**: Identical production environment across all machines. **No "it works on my machine" excuses**. Port mapping (`-p 8080:8080`) bridges container isolation to localhost access.
-
-### 2. Semantic Integrity (No More Magic Strings)
-**Problem**: Legacy CSV "M/F" → FHIR "male/female" mapping scattered in Python code creates maintenance nightmare.
-**Solution**: FSH Profile + ConceptMap ensures coded integrity:
-```fsh
-// In RMHCPatient.fsh
-* gender 1..1 MS  // Constrained to valid FHIR codes
-**Result: "M" → "male" validated by server, not hardcoded
-3.Transactional Atomicity
-**Problem**:POST Patient → POST Observation = race condition. Patient fails → orphaned Observation.
-Solution: Transaction Bundle with UUID resolution
-**
-Result: Single atomic POST to /fhir creates Patient+Observation together or fails completely.
+3. Transactional Atomicity: No Orphaned Data
+Problem: Creating a Patient first and Observations later can fail halfway, leaving orphaned clinical data with no patient reference.
+Solution: Using FHIR transaction bundles with temporary UUIDs, Patients and their Observations are submitted together as a single operation.
+Result: One request creates everything—or nothing at all. The FHIR server guarantees atomicity, preserving full referential and clinical integrity.
