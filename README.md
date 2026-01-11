@@ -1,3 +1,5 @@
+The Architect's Narrative
+
 1. Container Advantage:
 Problem: When students work across Windows, macOS, and Linux systems, inconsistencies in Java versions, HAPI FHIR dependencies, and PostgreSQL configurations frequently result in “dependency hell.”
 Solution: Docker standardises the entire technology stack with a single command that works identically across all machines.
@@ -12,4 +14,4 @@ Result: The server itself validates and converts correctly to business rules liv
 3. Transactional Atomicity: No Orphaned Data
 Problem: Creating a Patient first and Observations later can fail halfway, leaving orphaned clinical data with no patient reference.
 Solution: Using FHIR transaction bundles with temporary UUIDs, Patients and their Observations are submitted together as a single operation.
-Result: One request creates everything—or nothing at all. The FHIR server guarantees atomicity, preserving full referential and clinical integrity.
+Result: One request creates everything or nothing. The FHIR server guarantees atomicity, preserving full referential and clinical integrity.
